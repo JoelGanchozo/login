@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"> 
+	<title>Login con Facebook</title>
+<!-- Libreria del Último CSS, para la interfas de Usuario -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<!--Diseño para el Html -->
+	<link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<h1>Iniciar sesíon con Facebook</h1>
+
+<!--Url de la Imagen 'Git' de Facebook-->
+	<p><img src="https://www.gifmaniacos.es/wp-content/uploads/2017/09/gif-facebook-gifmaniacos.es-5.gif" alt="Login Facebook" width="250px"
+		height="250px" ></p>
+
+<!--Boton de Inicio de sesion con la SDK de Facebook-->
+	<fb:login-button id="fb-btn" scope="public_profile,email,user_birthday,user_location,user_posts" onlogin="checkLoginState();">
+	</fb:login-button>
+
+<!--Boton para Cerrar Sesion-->
+      <ul class="nav navbar-nav navbar-right">
+        <li><a id="logout" href="#" onclick="logout()" >Cerrar sesion</a></li>
+			</ul>
+
+<!--Archivos de Funcionamiento-->
+	<script>
+
+		//inicialisacion del SDK de Facebook
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId      : '2438302099554259',
+					cookie     : true,
+					xfbml      : true,
+					version    : 'v3.3'
+				});
+					
+				FB.AppEvents.logPageView();   
+					
+			};
+		
+			(function(d, s, id){
+				 var js, fjs = d.getElementsByTagName(s)[0];
+				 if (d.getElementById(id)) {return;}
+				 js = d.createElement(s); js.id = id;
+				 js.src = "https://connect.facebook.net/en_US/sdk.js";
+				 fjs.parentNode.insertBefore(js, fjs);
+			 }(document, 'script', 'facebook-jssdk'));
+			 
+			 //Verificacion de Logueo de Facabeook
+			 function statusChangeCallback(response){
+         if(response.status === 'connected'){
+           console.log('Logged in and authenticated');
+           setElements(true);
+           testAPI();
+         } else {
+           console.log('Not authenticated');
+           setElements(false);
+         }
+			 }
+			 
+			 //Estado de Logueo de la SDK de Facebook
+      function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+        });
+			}
+			
+			//Datos del usuario mediante el Logueo realizado, 'Correo' 'Dia de cumpleaños''Id de facebook'
+      function testAPI(){
+        FB.api('/me?fields=name,email,birthday,location', function(response){
+          if(response && !response.error){
+						
+						//Respuesta en la consola
+            buildProfile(response);
+					}
+
+        })
+			}
+			
+			//Funcion que Llama los datos del Usuario Logueado en Facebookx
+			function buildProfile(user){
+        let profile = `
+          <h3>PEDAL 911</h3> <h3>${user.name}</h3>
+					<ul class="list-group">
+						<li class="list-group-item">User ID: ${user.id}</li>
+            <li class="list-group-item">Email: ${user.email}</li>
+            <li class="list-group-item">Birthday: ${user.birthday}</li>
+          </ul>
+        `;
+
+        document.getElementById('profile').innerHTML = profile;
+
+			}
+			
+			//Funcion que comprueba los datos  del usuario Logueado en Facebook
+      function setElements(isLoggedIn){
+        if(isLoggedIn){
+          document.getElementById('logout').style.display = 'block';
+          document.getElementById('profile').style.display = 'block';
+        } else {
+          document.getElementById('logout').style.display = 'none';
+          document.getElementById('profile').style.display = 'none';
+        }
+			}
+			
+		  //Funcion conectada para cierre de sesion Facebook
+      function logout(){
+        FB.logout(function(response){
+          setElements(false);
+        });
+			}
+			
+		</script>
+</body>
+
+		<!--Impresion de datos obtenidos del usuario Logueado en Facebook, mediante la funcion que comprueba los datos-->
+    <div class="container">
+      <h3 id="heading"></h3>
+      <div id="profile"></div>
+      <div id="feed"></div>
+		</div>
+		
+ 
+</html>
